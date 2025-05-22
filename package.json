@@ -1,0 +1,21 @@
+{
+  "name": "wb-frontend-task",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "start": "vite --port 3000",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@vitejs/plugin-react": "^4.2.1",
+    "jsdom": "^23.0.1",
+    "vite": "^5.0.10",
+    "vitest": "^1.1.1"
+  }
+}
