@@ -17,6 +17,29 @@ body {
   display: grid;
 }
 
+.product-list h1 {
+  text-align: center;
+  color: #626a80;
+}
+
+.product-list div {
+  /* making the search label and input inline and making sure they don't overlap*/
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.product-list label {
+  margin-right: 1rem;
+}
+
+.product-list input {
+  min-width: 300px;
+}
+
+.product-list input:focus {
+  outline: 3px solid rgba(170, 50, 220);
+}
+
 .product-list table {
   border-collapse: collapse;
   border: 1px solid #626a80;
