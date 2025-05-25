@@ -28,11 +28,8 @@ body {
   white-space: nowrap;
 }
 
-.product-list label {
-  margin-right: 1rem;
-}
-
 .product-list input {
+  margin-left: 1rem;
   min-width: 300px;
 }
 

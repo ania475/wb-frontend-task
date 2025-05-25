@@ -7,11 +7,12 @@ const collator = new Intl.Collator(); //declaring a collator for product name co
 
 function App() {
   const [branches, setBranches] = useState({
-    branchOne: null,
-    branchTwo: null,
-    branchThree: null,
+    //initially declaring empty objects for the branches
+    branchOne: {},
+    branchTwo: {},
+    branchThree: {},
   });
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const [searchValue, setSearchValue] = useState("");
@@ -21,7 +22,7 @@ function App() {
   }, []);
 
   const fetchData = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const [resOne, resTwo, resThree] = await Promise.all([
         //fetching data from all three branches
@@ -31,25 +32,24 @@ function App() {
       ]);
 
       setBranches({
-        //storing the response in the branches state variable per branch
         branchOne: resOne,
         branchTwo: resTwo,
         branchThree: resThree,
       });
     } catch (err) {
       setError(err.message);
-      throw new Error(err);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  if (loading) return <p>Loading...</p>; //display loading text
+  if (isLoading) return <p>Loading...</p>; //display loading text
 
   if (error) {
     return <p>Error: {error}</p>; //if there is an error, display its message on the screen
   }
 
+  //getting all the products across all branches
   const allProducts = ["branchOne", "branchTwo", "branchThree"].flatMap(
     (branchKey) => {
       const branch = branches[branchKey];
@@ -66,7 +66,7 @@ function App() {
     allProducts.reduce((acc, product) => {
       const name = product.name;
       if (!acc[name]) {
-        acc[name] = { name, revenue: 0 }; //if there is not already a product with this name, initialising an entry in the accumulator with the revenue of 0
+        acc[name] = { name, revenue: 0 }; //if there is not already a product with this name, initialise an entry in the accumulator with the revenue of 0
       }
       acc[name].revenue += product.revenue; //adding the product revenue to the total revenue for this name
       return acc;
@@ -80,26 +80,25 @@ function App() {
     )
     .sort((a, b) => collator.compare(a.name, b.name)); //sort the names alphabetically by using the collator to compare the product names
 
-  //calculating the total revenue by adding the previously calculated sum with product revenue
+  //calculating the total revenue
   const totalRevenue = filteredProducts.reduce((sum, p) => sum + p.revenue, 0);
 
   return (
     <div className="product-list">
       <h1>Our Products</h1>
       <div className="search-div">
-        <label htmlFor="search-bar" aria-hidden="true">
+        <label htmlFor="search-bar">
           Search Products
+          <input
+            type="search"
+            aria-description="search results will appear below"
+            id="search-bar"
+            placeholder="Search by product name..."
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            aria-describedby="search-description"
+          />
         </label>
-        <input
-          type="search"
-          aria-description="search results will appear below"
-          id="search-bar"
-          placeholder="Search by product name..."
-          aria-label="Search Products"
-          value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          aria-describedby="search-description"
-        />
         <p id="search-description">Search results will appear below.</p>
       </div>
 
@@ -120,7 +119,8 @@ function App() {
             ))
           ) : (
             <tr>
-              <td colSpan="2">No products found.</td>
+              <td>No products found.</td>
+              <td>N/A</td>
             </tr>
           )}
         </tbody>
