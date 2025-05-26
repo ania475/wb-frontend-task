@@ -112,7 +112,7 @@ function App() {
         <tbody>
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product, index) => (
-              <tr key={index}>
+              <tr key={`${product}-${index}`}>
                 <td>{product.name}</td>
                 <td>{formatNumber(product.revenue)}</td>
               </tr>
