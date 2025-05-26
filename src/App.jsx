@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 const formatNumber = (number) =>
   new Intl.NumberFormat("en", { minimumFractionDigits: 2 }).format(number);
 
-const collator = new Intl.Collator(); //declaring a collator for product name comparison
+//declaring a collator for product name comparison
+const collator = new Intl.Collator();
 
 function App() {
   const [branches, setBranches] = useState({
-    //initially declaring empty objects for the branches
     branchOne: {},
     branchTwo: {},
     branchThree: {},
@@ -21,11 +21,11 @@ function App() {
     fetchData();
   }, []);
 
+  //fetching data from all branches
   const fetchData = async () => {
     setIsLoading(true);
     try {
       const [resOne, resTwo, resThree] = await Promise.all([
-        //fetching data from all three branches
         fetch(`api/branch1.json`).then((res) => res.json()),
         fetch(`api/branch2.json`).then((res) => res.json()),
         fetch(`api/branch3.json`).then((res) => res.json()),
@@ -43,42 +43,42 @@ function App() {
     }
   };
 
-  if (isLoading) return <p>Loading...</p>; //display loading text
+  if (isLoading) return <p>Loading...</p>;
 
   if (error) {
-    return <p>Error: {error}</p>; //if there is an error, display its message on the screen
+    return <p>Error: {error}</p>;
   }
 
-  //getting all the products across all branches
-  const allProducts = ["branchOne", "branchTwo", "branchThree"].flatMap(
-    (branchKey) => {
-      const branch = branches[branchKey];
-      if (!branch || !branch.products) return []; //if there is no branch name or products inside the branch, return an empty array
-      return branch.products.map((product) => ({
-        name: product.name,
-        revenue: product.unitPrice * product.sold,
-      }));
-    }
-  );
+  //getting all the products across all branches or return empty array if there is no data inside the branches
+  const allProducts = Object.keys(branches).flatMap((branchKey) => {
+    const branch = branches[branchKey];
+    if (!branch || !branch.products) return [];
+    return branch.products.map((product) => ({
+      name: product.name,
+      revenue: product.unitPrice * product.sold,
+    }));
+  });
 
   //aggregate the revenue by product name
-  const aggregatedProducts = Object.values(
-    allProducts.reduce((acc, product) => {
-      const name = product.name;
-      if (!acc[name]) {
-        acc[name] = { name, revenue: 0 }; //if there is not already a product with this name, initialise an entry in the accumulator with the revenue of 0
-      }
-      acc[name].revenue += product.revenue; //adding the product revenue to the total revenue for this name
-      return acc;
-    }, {})
-  );
+  const aggregatedProducts = {};
 
-  //filter the table by search bar value
-  const filteredProducts = aggregatedProducts
+  for (const product of allProducts) {
+    const productName = product.name;
+    const productRevenue = product.revenue;
+
+    if (!aggregatedProducts[productName]) {
+      aggregatedProducts[productName] = { name: productName, revenue: 0 };
+    }
+
+    aggregatedProducts[productName].revenue += productRevenue;
+  }
+
+  //filter the table by search bar value and sort the names alphabetically using the collator
+  const filteredProducts = Object.values(aggregatedProducts)
     .filter((product) =>
       product.name.toLowerCase().includes(searchValue.toLowerCase())
     )
-    .sort((a, b) => collator.compare(a.name, b.name)); //sort the names alphabetically by using the collator to compare the product names
+    .sort((a, b) => collator.compare(a.name, b.name));
 
   //calculating the total revenue
   const totalRevenue = filteredProducts.reduce((sum, p) => sum + p.revenue, 0);
